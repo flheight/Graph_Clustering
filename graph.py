@@ -17,9 +17,9 @@ class Graph:
                 segment_norm = np.linalg.norm(segment_ij)
 
                 projs_i = np.dot(X[kmeans.labels_ == i] - kmeans.cluster_centers_[i], segment_ij)
-                score_i = projs_i[projs_i > 0].sum()
+                score_i = np.maximum(projs_i, 0).sum()
                 projs_j = np.dot(X[kmeans.labels_ == j] - kmeans.cluster_centers_[j], segment_ji)
-                score_j = projs_j[projs_j > 0].sum()
+                score_j = np.maximum(projs_j, 0).sum()
 
                 affinity[i, j] = np.power((score_i + score_j) / (projs_i.shape[0] + projs_j.shape[0]), .5) / segment_norm
 
