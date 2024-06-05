@@ -5,7 +5,7 @@ class Graph:
     def __init__(self, n_classes):
         self.n_classes = n_classes
 
-    def fit(self, X, n_nodes, M=1e2, alpha=.5):
+    def fit(self, X, n_nodes, M=1e2):
         kmeans = KMeans(n_clusters=n_nodes).fit(X)
 
         affinity = np.zeros((n_nodes, n_nodes))
@@ -21,7 +21,7 @@ class Graph:
                 projs_j = np.dot(X[kmeans.labels_ == j] - kmeans.cluster_centers_[j], segment_ji)
                 score_j = projs_j[projs_j > 0].sum()
 
-                affinity[i, j] = np.power((score_i + score_j) / (projs_i.shape[0] + projs_j.shape[0]) / segment_norm2, alpha)
+                affinity[i, j] = np.power((score_i + score_j) / (projs_i.shape[0] + projs_j.shape[0]) / segment_norm2, .5)
 
         affinity += affinity.T
 
