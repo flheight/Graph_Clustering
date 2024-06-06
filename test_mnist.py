@@ -11,7 +11,7 @@ data = np.genfromtxt('mnist_test.csv', delimiter=',')[1:]
 
 X, y = data[:, 1:], data[:, 0]
 
-X = PCA(n_components=64).fit_transform(X)
+X = PCA(n_components=64, random_state=42).fit_transform(X)
 
 k = 10
 
