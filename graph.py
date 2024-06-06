@@ -31,7 +31,7 @@ class Graph:
         gamma = np.log(M) / (q3 - q1)
         affinity = np.exp(gamma * affinity)
 
-        labels = SpectralClustering(n_clusters=self.n_classes, affinity='precomputed').fit_predict(affinity)
+        labels = SpectralClustering(n_clusters=self.n_classes, affinity='precomputed', assign_labels='cluster_qr').fit_predict(affinity)
         self.clusters = [kmeans.cluster_centers_[labels == i] for i in range(self.n_classes)]
 
     def predict(self, x):
