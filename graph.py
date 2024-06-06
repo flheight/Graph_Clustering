@@ -10,14 +10,15 @@ class Graph:
 
         affinity = np.zeros((n_nodes, n_nodes))
 
+        X_centered = [X[kmeans.labels_ == i] - kmeans.cluster_centers_[i] for i in range(n_nodes)]
         segments = kmeans.cluster_centers_[:, np.newaxis] - kmeans.cluster_centers_[np.newaxis, :]
         norms = np.linalg.norm(segments, axis=2)
 
         for i in range(n_nodes):
             for j in range(i):
-                projs_i = np.dot(X[kmeans.labels_ == i] - kmeans.cluster_centers_[i], segments[i, j])
+                projs_i = np.dot(X_centered[i], segments[i, j])
                 score_i = np.maximum(projs_i, 0).sum()
-                projs_j = np.dot(X[kmeans.labels_ == j] - kmeans.cluster_centers_[j], segments[j, i])
+                projs_j = np.dot(X_centered[j], segments[j, i])
                 score_j = np.maximum(projs_j, 0).sum()
 
                 affinity[i, j] = np.power((score_i + score_j) / (projs_i.shape[0] + projs_j.shape[0]), .5) / norms[i, j]
