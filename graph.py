@@ -11,25 +11,21 @@ class Graph:
 
         affinity = np.zeros((n_nodes, n_nodes))
 
-        tril_mask = np.tri(n_nodes, n_nodes, k=-1, dtype=bool)
-
         X_centered = [X[kmeans.labels_ == i] - kmeans.cluster_centers_[i] for i in range(n_nodes)]
 
         counts = np.array([X_centered[i].shape[0] for i in range(n_nodes)])
-        counts = (counts[:, np.newaxis] + counts[np.newaxis, :])[tril_mask]
-        
+        counts = counts[:, np.newaxis] + counts[np.newaxis, :]
+
         segments = kmeans.cluster_centers_[:, np.newaxis] - kmeans.cluster_centers_[np.newaxis, :]
-        dists = np.einsum('ij,ij->i', segments[tril_mask], segments[tril_mask])
+        dists = np.einsum('ijk,ijk->ij', segments, segments)
+        np.fill_diagonal(dists, 1)
 
         for i in range(1, n_nodes):
-            projs_i = np.dot(X_centered[i], segments[i, :i].T)
-            affinity[i, :i] = np.maximum(projs_i, 0).sum(axis=0)
-            for j in range(i):
-                projs_j = np.dot(X_centered[j], segments[j, i])
-                affinity[i, j] += np.maximum(projs_j, 0).sum()
+            projs = np.dot(X_centered[i], segments[i].T)
+            affinity[i] = np.maximum(projs, 0).sum(axis=0)
 
-        affinity[tril_mask] = np.power(affinity[tril_mask] / (counts * dists), .5)
         affinity += affinity.T
+        affinity = np.power(affinity / (counts * dists), .5)
 
         q1 = np.quantile(affinity, .25)
         q3 = np.quantile(affinity, .75)
