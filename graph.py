@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.cluster import KMeans, SpectralClustering
+from scipy.spatial import cKDTree
 
 class Graph:
     def __init__(self, n_classes):
@@ -35,8 +36,5 @@ class Graph:
         self.clusters = [kmeans.cluster_centers_[labels == i] for i in range(self.n_classes)]
 
     def predict(self, x):
-        diffs = [x - cluster[:, np.newaxis] for cluster in self.clusters]
-        dists = [np.einsum('ijk,ijk->ij', df, df) for df in diffs]
-
-        min_dists = np.array([np.min(dt, axis=0) for dt in dists])
-        return np.argmin(min_dists, axis=0)
+        min_dists = np.array([cKDTree(cluster).query(x, 1)[0] for cluster in self.clusters])
+        return min_dists.argmin(axis=0) 
