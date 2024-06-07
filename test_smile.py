@@ -6,7 +6,7 @@ from sklearn.metrics import adjusted_rand_score
 
 np.random.seed(0)
 
-data = np.genfromtxt('smile.csv', delimiter=',')[1:]
+data = np.genfromtxt('datasets/smile.csv', delimiter=',')[1:]
 
 X, y = data[:, :-1], data[:, -1]
 
