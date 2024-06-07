@@ -1,5 +1,5 @@
 import numpy as np
-from sklearn.cluster import MiniBatchKMeans, SpectralClustering
+from sklearn.cluster import KMeans, SpectralClustering
 from scipy.spatial import cKDTree
 
 class Graph:
@@ -7,7 +7,7 @@ class Graph:
         self.n_classes = n_classes
 
     def fit(self, X, n_nodes, M=1e2):
-        kmeans = MiniBatchKMeans(n_clusters=n_nodes).fit(X)
+        kmeans = KMeans(n_clusters=n_nodes).fit(X)
 
         affinity = np.zeros((n_nodes, n_nodes))
 
@@ -15,7 +15,7 @@ class Graph:
         segments = kmeans.cluster_centers_[:, np.newaxis] - kmeans.cluster_centers_[np.newaxis, :]
         norms = np.linalg.norm(segments, axis=2)
 
-        for i in range(n_nodes):
+        for i in range(1, n_nodes):
             projs_i = np.dot(X_centered[i], segments[i, :i].T)
             score_i = np.maximum(projs_i, 0).sum(axis=0)
             for j in range(i):
