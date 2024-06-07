@@ -16,13 +16,12 @@ class Graph:
         norms = np.linalg.norm(segments, axis=2)
 
         for i in range(n_nodes):
+            projs_i = np.dot(X_centered[i], segments[i, :i].T)
+            score_i = np.maximum(projs_i, 0).sum(axis=0)
             for j in range(i):
-                projs_i = np.dot(X_centered[i], segments[i, j])
-                score_i = np.maximum(projs_i, 0).sum()
                 projs_j = np.dot(X_centered[j], segments[j, i])
                 score_j = np.maximum(projs_j, 0).sum()
-
-                affinity[i, j] = np.power((score_i + score_j) / (projs_i.shape[0] + projs_j.shape[0]), .5) / norms[i, j]
+                affinity[i, j] = np.power((score_i[j] + score_j) / (X_centered[i].shape[0] + X_centered[j].shape[0]), .5) / norms[i, j]
 
         affinity += affinity.T
 
