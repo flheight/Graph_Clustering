@@ -12,19 +12,20 @@ class Graph:
         affinity = np.zeros((n_nodes, n_nodes))
 
         X_centered = [X[kmeans.labels_ == i] - kmeans.cluster_centers_[i] for i in range(n_nodes)]
+        counts = np.array([X_centered[i].shape[0] for i in range(n_nodes)])
+        counts = counts[:, np.newaxis] + counts[np.newaxis, :]
         segments = kmeans.cluster_centers_[:, np.newaxis] - kmeans.cluster_centers_[np.newaxis, :]
         dists = np.einsum('ijk,ijk->ij', segments, segments)
         np.fill_diagonal(dists, 1)
 
         for i in range(1, n_nodes):
             projs_i = np.dot(X_centered[i], segments[i, :i].T)
-            scores_i = np.maximum(projs_i, 0).sum(axis=0)
+            affinity[i, :i] = np.maximum(projs_i, 0).sum(axis=0)
             for j in range(i):
                 projs_j = np.dot(X_centered[j], segments[j, i])
-                score_j = np.maximum(projs_j, 0).sum()
-                affinity[i, j] = (scores_i[j] + score_j) / (X_centered[i].shape[0] + X_centered[j].shape[0])
+                affinity[i, j] += np.maximum(projs_j, 0).sum()
 
-        affinity = np.power((affinity + affinity.T) / dists, .5)
+        affinity = np.power((affinity + affinity.T) / (counts * dists), .5)
 
         q1 = np.quantile(affinity, .25)
         q3 = np.quantile(affinity, .75)
