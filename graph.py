@@ -16,7 +16,7 @@ class Graph:
         X_centered = [X[kmeans.labels_ == i] - kmeans.cluster_centers_[i] for i in range(n_nodes)]
 
         counts = np.array([X_centered[i].shape[0] for i in range(n_nodes)])
-        counts = counts[:, np.newaxis] + counts[np.newaxis, :]
+        counts = (counts[:, np.newaxis] + counts[np.newaxis, :])[tril_mask]
         
         segments = kmeans.cluster_centers_[:, np.newaxis] - kmeans.cluster_centers_[np.newaxis, :]
         dists = np.einsum('ij,ij->i', segments[tril_mask], segments[tril_mask])
@@ -28,7 +28,7 @@ class Graph:
                 projs_j = np.dot(X_centered[j], segments[j, i])
                 affinity[i, j] += np.maximum(projs_j, 0).sum()
 
-        affinity[tril_mask] = np.power(affinity[tril_mask] / (counts[tril_mask] * dists), .5)
+        affinity[tril_mask] = np.power(affinity[tril_mask] / (counts * dists), .5)
         affinity += affinity.T
 
         q1 = np.quantile(affinity, .25)
