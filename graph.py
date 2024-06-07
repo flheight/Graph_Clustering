@@ -13,17 +13,18 @@ class Graph:
 
         X_centered = [X[kmeans.labels_ == i] - kmeans.cluster_centers_[i] for i in range(n_nodes)]
         segments = kmeans.cluster_centers_[:, np.newaxis] - kmeans.cluster_centers_[np.newaxis, :]
-        norms = np.linalg.norm(segments, axis=2)
+        dists = np.einsum('ijk,ijk->ij', segments, segments)
+        np.fill_diagonal(dists, 1)
 
         for i in range(1, n_nodes):
             projs_i = np.dot(X_centered[i], segments[i, :i].T)
-            score_i = np.maximum(projs_i, 0).sum(axis=0)
+            scores_i = np.maximum(projs_i, 0).sum(axis=0)
             for j in range(i):
                 projs_j = np.dot(X_centered[j], segments[j, i])
                 score_j = np.maximum(projs_j, 0).sum()
-                affinity[i, j] = np.power((score_i[j] + score_j) / (X_centered[i].shape[0] + X_centered[j].shape[0]), .5) / norms[i, j]
+                affinity[i, j] = (scores_i[j] + score_j) / (X_centered[i].shape[0] + X_centered[j].shape[0])
 
-        affinity += affinity.T
+        affinity = np.power((affinity + affinity.T) / dists, .5)
 
         q1 = np.quantile(affinity, .25)
         q3 = np.quantile(affinity, .75)
