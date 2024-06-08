@@ -39,7 +39,7 @@ class Graph:
         _, eigvecs = np.linalg.eigh(L)
         eigvecs = eigvecs[:, :self.n_classes]
         eigvecs /= np.linalg.norm(eigvecs, axis=1)[:, np.newaxis]
-        labels =  KMeans(n_clusters=self.n_classes).fit_predict(eigvecs)
+        labels = KMeans(n_clusters=self.n_classes).fit_predict(eigvecs)
         self.clusters = [kmeans.cluster_centers_[labels == i] for i in range(self.n_classes)]
 
     def predict(self, x):
