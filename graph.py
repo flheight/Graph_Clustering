@@ -7,7 +7,7 @@ class Graph:
     def __init__(self, n_classes):
         self.n_classes = n_classes
 
-    def fit(self, X, n_nodes, M=1e4):
+    def fit(self, X, n_nodes, M=1e3):
         kmeans = KMeans(n_clusters=n_nodes).fit(X)
 
         affinity = np.empty((n_nodes, n_nodes))
