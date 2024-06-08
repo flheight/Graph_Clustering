@@ -1,5 +1,6 @@
 import numpy as np
-from sklearn.cluster import KMeans, SpectralClustering
+from sklearn.cluster import KMeans
+from scipy.sparse.csgraph import laplacian
 from scipy.spatial import cKDTree
 
 class Graph:
@@ -33,7 +34,12 @@ class Graph:
         gamma = np.log(M) / (q3 - q1)
         affinity = np.exp(gamma * affinity)
 
-        labels = SpectralClustering(n_clusters=self.n_classes, affinity='precomputed', assign_labels='cluster_qr').fit_predict(affinity)
+        L = laplacian(affinity, normed=True)
+        
+        eigvecs = np.linalg.eigh(L)[1]
+        eigvecs = eigvecs[:, :self.n_classes]
+        eigvecs /= np.linalg.norm(eigvecs, axis=1)[:, np.newaxis]
+        labels =  KMeans(n_clusters=self.n_classes).fit_predict(eigvecs)
         self.clusters = [kmeans.cluster_centers_[labels == i] for i in range(self.n_classes)]
 
     def predict(self, x):
