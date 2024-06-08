@@ -36,7 +36,7 @@ class Graph:
 
         L = laplacian(affinity, normed=True)
         
-        eigvecs = np.linalg.eigh(L)[1]
+        _, eigvecs = np.linalg.eigh(L)
         eigvecs = eigvecs[:, :self.n_classes]
         eigvecs /= np.linalg.norm(eigvecs, axis=1)[:, np.newaxis]
         labels =  KMeans(n_clusters=self.n_classes).fit_predict(eigvecs)
