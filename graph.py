@@ -9,7 +9,7 @@ class Graph:
     def fit(self, X, n_nodes, M=1e2):
         kmeans = KMeans(n_clusters=n_nodes).fit(X)
 
-        affinity = np.zeros((n_nodes, n_nodes))
+        affinity = np.empty((n_nodes, n_nodes))
 
         X_centered = [X[kmeans.labels_ == i] - kmeans.cluster_centers_[i] for i in range(n_nodes)]
 
@@ -20,7 +20,7 @@ class Graph:
         dists = np.einsum('ijk,ijk->ij', segments, segments)
         np.fill_diagonal(dists, 1)
 
-        for i in range(1, n_nodes):
+        for i in range(n_nodes):
             projs = np.dot(X_centered[i], segments[i].T)
             affinity[i] = np.maximum(projs, 0).sum(axis=0)
 
