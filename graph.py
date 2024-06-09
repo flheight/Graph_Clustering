@@ -25,8 +25,8 @@ class Graph:
             projs = np.dot(X_centered[i], segments[i].T)
             affinity[i] = np.maximum(projs, 0).sum(axis=0)
 
-        affinity += affinity.T
-        affinity = np.power(affinity / (counts * dists), .5)
+        affinity = np.power((affinity + affinity.T) / (counts * dists), .5)
+        affinity -= .5 * affinity.max()
 
         q1 = np.quantile(affinity, .25)
         q3 = np.quantile(affinity, .75)
