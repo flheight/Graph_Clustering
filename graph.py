@@ -15,9 +15,9 @@ class Graph:
         X_centered = [X[kmeans.labels_ == i] - kmeans.cluster_centers_[i] for i in range(n_nodes)]
 
         counts = np.array([X_centered[i].shape[0] for i in range(n_nodes)])
-        counts = counts[:, np.newaxis] + counts[np.newaxis, :]
+        counts = counts[np.newaxis, :] + counts[:, np.newaxis]
 
-        segments = kmeans.cluster_centers_[:, np.newaxis] - kmeans.cluster_centers_[np.newaxis, :]
+        segments = kmeans.cluster_centers_[np.newaxis, :] - kmeans.cluster_centers_[:, np.newaxis]
         dists = np.einsum('ijk,ijk->ij', segments, segments)
         np.fill_diagonal(dists, 1)
 
