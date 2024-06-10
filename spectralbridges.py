@@ -28,8 +28,7 @@ class SpectralBridges:
         affinity = np.power((affinity + affinity.T) / (counts * dists), .5)
         affinity -= .5 * affinity.max()
 
-        q1 = np.quantile(affinity, .25)
-        q3 = np.quantile(affinity, .75)
+        q1, q3 = np.quantile(affinity, [.25, .75])
 
         gamma = np.log(M) / (q3 - q1)
         affinity = np.exp(gamma * affinity)
