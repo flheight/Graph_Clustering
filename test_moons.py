@@ -12,7 +12,7 @@ X, y = data[:, :-1], data[:, -1]
 
 k = 2
 
-net = Graph(n_classes=k)
+net = SpectralBridges(n_classes=k)
 
 net.fit(X, 12)
 
