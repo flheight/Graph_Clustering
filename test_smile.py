@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from graph import Graph
+from spectralbridges import SpectralBridges
 
 from sklearn.metrics import adjusted_rand_score
 
@@ -12,7 +12,7 @@ X, y = data[:, :-1], data[:, -1]
 
 k = 4
 
-net = Graph(n_classes=k)
+net = SpectralBridges(n_classes=k)
 
 net.fit(X, 100)
 
