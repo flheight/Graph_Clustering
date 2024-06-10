@@ -14,7 +14,7 @@ k = 7
 
 net = Graph(n_classes=k)
 
-net.fit(X, 200)
+net.fit(X, 250)
 
 colors = plt.cm.tab10(np.arange(k))
 
