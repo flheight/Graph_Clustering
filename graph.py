@@ -2,12 +2,13 @@ import numpy as np
 from sklearn.cluster import KMeans
 from scipy.sparse.csgraph import laplacian
 from scipy.spatial import cKDTree
+from bisect import bisect
 
 class Graph:
     def __init__(self, n_classes):
         self.n_classes = n_classes
 
-    def fit(self, X, n_nodes, M=1e3):
+    def fit(self, X, n_nodes, M=1e4):
         kmeans = KMeans(n_clusters=n_nodes).fit(X)
 
         affinity = np.empty((n_nodes, n_nodes))
@@ -35,13 +36,15 @@ class Graph:
         affinity = np.exp(gamma * affinity)
 
         L = laplacian(affinity, normed=True)
-        
+
         _, eigvecs = np.linalg.eigh(L)
         eigvecs = eigvecs[:, :self.n_classes]
         eigvecs /= np.linalg.norm(eigvecs, axis=1)[:, np.newaxis]
         labels = KMeans(n_clusters=self.n_classes).fit_predict(eigvecs)
+
         self.clusters = [kmeans.cluster_centers_[labels == i] for i in range(self.n_classes)]
 
     def predict(self, x):
-        min_dists = np.array([cKDTree(cluster).query(x, 1)[0] for cluster in self.clusters])
-        return min_dists.argmin(axis=0) 
+        cutoffs = np.cumsum([cluster.shape[0] for cluster in self.clusters])
+        I = cKDTree(np.vstack(self.clusters)).query(x, 1)[1]
+        return np.array([bisect(cutoffs, i) for i in I])
