@@ -15,7 +15,7 @@ X = PCA(n_components=64, random_state=42).fit_transform(X)
 
 k = 10
 
-net = Graph(n_classes=k)
+net = SpectralBridges(n_classes=k)
 
 ari = 0
 for i in range(10):
