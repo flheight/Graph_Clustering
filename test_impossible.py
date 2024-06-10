@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from graph import Graph
+from spectralbridges import SpectralBridges
 
 from sklearn.metrics import adjusted_rand_score
 
