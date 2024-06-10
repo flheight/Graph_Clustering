@@ -2,7 +2,6 @@ import numpy as np
 from sklearn.cluster import KMeans
 from scipy.sparse.csgraph import laplacian
 from scipy.spatial import cKDTree
-from bisect import bisect
 
 class Graph:
     def __init__(self, n_classes):
@@ -47,4 +46,4 @@ class Graph:
     def predict(self, x):
         cutoffs = np.cumsum([cluster.shape[0] for cluster in self.clusters])
         I = cKDTree(np.vstack(self.clusters)).query(x, 1)[1]
-        return np.array([bisect(cutoffs, i) for i in I])
+        return np.searchsorted(cutoffs, I, side='right') - 1
