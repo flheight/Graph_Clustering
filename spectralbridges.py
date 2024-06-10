@@ -3,7 +3,7 @@ from sklearn.cluster import KMeans
 from scipy.sparse.csgraph import laplacian
 from scipy.spatial import cKDTree
 
-class Graph:
+class SpectralBridges:
     def __init__(self, n_classes):
         self.n_classes = n_classes
 
