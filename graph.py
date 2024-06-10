@@ -44,6 +44,5 @@ class Graph:
         self.clusters = [kmeans.cluster_centers_[labels == i] for i in range(self.n_classes)]
 
     def predict(self, x):
-        cutoffs = np.cumsum([cluster.shape[0] for cluster in self.clusters])
-        I = cKDTree(np.vstack(self.clusters)).query(x, 1)[1]
-        return np.searchsorted(cutoffs, I, side='right') - 1
+        min_dists = np.array([cKDTree(cluster).query(x, 1)[0] for cluster in self.clusters])
+        return min_dists.argmin(axis=0)
