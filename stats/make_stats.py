@@ -2,9 +2,9 @@ import plotly.graph_objects as go
 
 # Define the dimensions and scores
 dim = ['h=8', 'h=16', 'h=32', 'h=64', 'h=784 (full)']
-k_means_scores = [0.36, 0.36, 0.37, 0.37, 0.39]
-em_scores = [0.51, 0.49, 0.50, 0.52, 0.53]
-ac_scores = [0.49, 0.51, 0.61, 0.54, 0.61]
+k_means_scores = [0.36, 0.36, 0.37, 0.37, 0.36]
+em_scores = [0.40, 0.53, 0.45, 0.52, 0.50]
+ac_scores = [0.39, 0.45, 0.50, 0.43, 0.42]
 bridge_scores = [0.61, 0.73, 0.76, 0.79, 0.59]
 
 # Define colors for each method and their lighter shades
@@ -38,7 +38,6 @@ for method, score in zip(methods, scores):
 
 # Update layout with title and axis labels
 fig.update_layout(
-    title='Comparison of ARI Scores between various methods on PCA reduced MNIST',
     xaxis_title='h',
     yaxis_title='ARI Score',
     barmode='group'
