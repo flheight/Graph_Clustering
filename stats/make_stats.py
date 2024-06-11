@@ -36,15 +36,28 @@ for method, score in zip(methods, scores):
         marker_color=[get_bar_color(score[i], max_scores[i], method) for i in range(len(dim))]
     ))
 
-# Update layout with title and axis labels
+# Update layout with larger and bold axis titles and tick labels
 fig.update_layout(
     xaxis_title='h',
     yaxis_title='ARI Score',
-    barmode='group'
+    xaxis=dict(
+        title_font=dict(size=28),
+        tickfont=dict(size=24)
+    ),
+    yaxis=dict(
+        title_font=dict(size=28),
+        tickfont=dict(size=24)
+    ),
+    barmode='group',
+    legend=dict(
+        font=dict(
+            size=20,
+            weight='bold'
+        ),
+        title_font_size=24,
+        itemsizing='constant'
+    )
 )
 
 # Save the figure as an HTML file
 fig.write_html("stats.html")
-
-# Show the figure
-fig.show()
