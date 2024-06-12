@@ -36,7 +36,7 @@ class SpectralBridges:
         L = laplacian(affinity, normed=True)
 
         eigvecs = np.linalg.eigh(L)[1]
-        eigvecs = eigvecs[:, 1:self.n_classes]
+        eigvecs = eigvecs[:, :self.n_classes]
         eigvecs /= np.linalg.norm(eigvecs, axis=1)[:, np.newaxis]
         labels = KMeans(n_clusters=self.n_classes).fit_predict(eigvecs)
 
