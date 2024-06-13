@@ -3,6 +3,7 @@ from sklearn.cluster import DBSCAN, KMeans, AgglomerativeClustering
 from sklearn.mixture import GaussianMixture
 from sklearn.metrics import adjusted_rand_score, normalized_mutual_info_score
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 import plotly.io as pio
 
 #set seed
@@ -10,7 +11,7 @@ np.random.seed(0)
 
 # Function to load data
 def load_data(file_name):
-    data = np.genfromtxt('datasets/circles.csv', delimiter=',')
+    data = np.genfromtxt(f'datasets/{file_name}', delimiter=',')
     X, y = data[:, :-1], data[:, -1]
     return X, y
 
@@ -18,7 +19,7 @@ def load_data(file_name):
 files = ['impossible.csv', 'moons.csv', 'circles.csv', 'smile.csv']
 
 # Number of repetitions
-N = 10
+N = 200
 
 # Initialize results dictionary
 results = {'DBSCAN': {}, 'KMeans': {}, 'GaussianMixture': {}, 'AgglomerativeClustering': {}}
@@ -156,5 +157,7 @@ fig.update_layout(
 for i in range(2):
     fig.layout.annotations[i].font.size = 25  # Increase subplot titles font size
 
+
 # Save the figure as an HTML file
 pio.write_image(fig, "synthetic_summary.pdf")
+
