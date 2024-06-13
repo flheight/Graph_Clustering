@@ -12,7 +12,7 @@ X, y = data[:, :-1], data[:, -1]
 
 k = 7
 
-net = SpectralBridges(n_classes=k)
+net = SpectralBridges(n_clusters=k)
 
 net.fit(X, 250)
 
