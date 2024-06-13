@@ -4,7 +4,7 @@ from scipy.sparse.csgraph import laplacian
 from scipy.spatial import cKDTree
 
 class SpectralBridges:
-    def __init__(self, n_classes, random_state=0):
+    def __init__(self, n_classes, random_state=None):
         self.n_classes = n_classes
         self.random_state = random_state
 
