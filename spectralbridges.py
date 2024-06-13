@@ -5,14 +5,15 @@ from scipy.spatial import cKDTree
 import faiss
 
 class KMeans:
-    def __init__(self, n_clusters, n_iter=20):
+    def __init__(self, n_clusters, n_iter=15, random_state=None):
         self.n_clusters = n_clusters
         self.n_iter = n_iter
+        self.random_state = random_state
 
     def fit(self, X):
         index = faiss.IndexFlatL2(X.shape[1])  # Using L2 distance
         kmeans = faiss.Clustering(X.shape[1], self.n_clusters)
-        init_centroids =  kmeans_plusplus(X, self.n_clusters)[0].astype(np.float32)
+        init_centroids = kmeans_plusplus(X, n_clusters=self.n_clusters, random_state=self.random_state)[0].astype(np.float32)
 
         kmeans.centroids.resize(init_centroids.size)
         faiss.memcpy(kmeans.centroids.data(), faiss.swig_ptr(init_centroids), init_centroids.size * 4)
@@ -25,11 +26,12 @@ class KMeans:
         self.labels_ = index.search(X.astype(np.float32), 1)[1].ravel()
 
 class SpectralBridges:
-    def __init__(self, n_clusters):
+    def __init__(self, n_clusters, random_state=None):
         self.n_clusters = n_clusters
+        self.random_state = random_state
 
     def fit(self, X, n_nodes, M=1e4):
-        kmeans_pre = KMeans(n_clusters=n_nodes)
+        kmeans_pre = KMeans(n_clusters=n_nodes, random_state=self.random_state)
         kmeans_pre.fit(X)
 
         affinity = np.empty((n_nodes, n_nodes))
@@ -60,7 +62,7 @@ class SpectralBridges:
         eigvecs = np.linalg.eigh(L)[1]
         eigvecs = eigvecs[:, :self.n_clusters]
         eigvecs /= np.linalg.norm(eigvecs, axis=1)[:, np.newaxis]
-        kmeans_post = KMeans(n_clusters=self.n_clusters)
+        kmeans_post = KMeans(n_clusters=self.n_clusters, random_state=self.random_state)
         kmeans_post.fit(eigvecs)
 
         self.clusters = [kmeans_pre.cluster_centers_[kmeans_post.labels_ == i] for i in range(self.n_clusters)]
@@ -71,6 +73,6 @@ class SpectralBridges:
         for i, cluster in enumerate(self.clusters):
             index = faiss.IndexFlatL2(x.shape[1])
             index.add(cluster.astype(np.float32))
-            min_dists[i] = index.search(x.astype(np.float32), 1)[1].ravel()
+            min_dists[i] = index.search(x.astype(np.float32), 1)[0].ravel()
 
         return min_dists.argmin(axis=0)
