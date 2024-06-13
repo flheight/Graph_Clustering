@@ -4,8 +4,8 @@ from scipy.sparse.csgraph import laplacian
 from scipy.spatial import cKDTree
 
 class SpectralBridges:
-    def __init__(self, n_classes, random_state=None):
-        self.n_classes = n_classes
+    def __init__(self, n_clusters, random_state=None):
+        self.n_clusters = n_clusters
         self.random_state = random_state
 
     def fit(self, X, n_nodes, M=1e4):
@@ -37,11 +37,11 @@ class SpectralBridges:
         L = laplacian(affinity, normed=True)
 
         eigvecs = np.linalg.eigh(L)[1]
-        eigvecs = eigvecs[:, :self.n_classes]
+        eigvecs = eigvecs[:, :self.n_clusters]
         eigvecs /= np.linalg.norm(eigvecs, axis=1)[:, np.newaxis]
-        labels = KMeans(n_clusters=self.n_classes, random_state=self.random_state).fit_predict(eigvecs)
+        labels = KMeans(n_clusters=self.n_clusters, random_state=self.random_state).fit_predict(eigvecs)
 
-        self.clusters = [kmeans.cluster_centers_[labels == i] for i in range(self.n_classes)]
+        self.clusters = [kmeans.cluster_centers_[labels == i] for i in range(self.n_clusters)]
 
     def predict(self, x):
         min_dists = np.array([cKDTree(cluster).query(x, 1)[0] for cluster in self.clusters])
