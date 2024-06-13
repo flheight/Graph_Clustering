@@ -29,6 +29,9 @@ for file in files:
     # Load data
     X, y = load_data(file)
 
+    # Number of classes
+    n_clusters = np.unique(y).shape[0]
+
     # Initialize arrays for each algorithm and metric
     dbscan_ari = np.zeros(N)
     dbscan_nmi = np.zeros(N)
@@ -47,22 +50,24 @@ for file in files:
         dbscan_nmi[i] = normalized_mutual_info_score(y, y_pred_dbscan)
 
         # KMeans
-        kmeans = KMeans(n_clusters=len(np.unique(y)), random_state=i)
+        kmeans = KMeans(n_clusters=n_clusters, random_state=i)
         y_pred_kmeans = kmeans.fit_predict(X)
         kmeans_ari[i] = adjusted_rand_score(y, y_pred_kmeans)
         kmeans_nmi[i] = normalized_mutual_info_score(y, y_pred_kmeans)
 
         # Gaussian Mixture
-        gm = GaussianMixture(n_components=len(np.unique(y)), random_state=i)
+        gm = GaussianMixture(n_components=n_clusters, random_state=i)
         y_pred_gm = gm.fit_predict(X)
         gm_ari[i] = adjusted_rand_score(y, y_pred_gm)
         gm_nmi[i] = normalized_mutual_info_score(y, y_pred_gm)
 
         # Agglomerative Clustering
-        agg_clustering = AgglomerativeClustering(n_clusters=len(np.unique(y)))
+        agg_clustering = AgglomerativeClustering(n_clusters=n_clusters)
         y_pred_agg = agg_clustering.fit_predict(X)
         agg_ari[i] = adjusted_rand_score(y, y_pred_agg)
         agg_nmi[i] = normalized_mutual_info_score(y, y_pred_agg)
+
+        print(f"{int((100 * i) / (len(files) * N))}% done")
 
     # Store results in dictionary
     results['DBSCAN'][file] = {
