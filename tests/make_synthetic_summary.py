@@ -3,7 +3,6 @@ from sklearn.cluster import DBSCAN, KMeans, AgglomerativeClustering
 from sklearn.mixture import GaussianMixture
 from sklearn.metrics import adjusted_rand_score, normalized_mutual_info_score
 import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 import plotly.io as pio
 
 #set seed
@@ -85,4 +84,77 @@ for file in files:
         'NMI': agg_nmi
     }
 
-print(results)
+# Define datasets, methods, and metrics
+dataset_labels = ["Impossible", "Moons", "Circles", "Smile"]
+methods = ["DBSCAN", "KMeans", "GaussianMixture", "AgglomerativeClustering"]
+metrics = ["ARI", "NMI"]
+
+# Define colors for each method
+method_colors = {
+    "DBSCAN": "orange",
+    "KMeans": "blue",
+    "GaussianMixture": "green",
+    "AgglomerativeClustering": "red",
+    "SpectralBridges": "purple"
+}
+
+# Define method labels for the legend
+method_labels = {
+    "DBSCAN": "DB",
+    "KMeans": "KM",
+    "GaussianMixture": "EM",
+    "AgglomerativeClustering": "WC",
+    "SpectralBridges": "SB"
+}
+
+# Create boxplots for ARI and NMI
+fig = make_subplots(
+    rows=len(files),  # Number of rows equals the number of datasets
+    cols=2,  # Two columns for ARI and NMI
+    shared_xaxes=True,
+    subplot_titles=("ARI", "NMI"),
+    vertical_spacing=0.05,  # Reduce vertical spacing
+    horizontal_spacing=0.075  # Reduce horizontal spacing
+)
+
+# Helper function to add traces
+def add_traces(fig, metric, col):
+    for dataset in files:
+        for method in methods:
+            data = results[method][dataset][metric]
+            if data.size > 0:
+                fig.add_trace(
+                    go.Box(
+                        y=data,
+                        name=method_labels[method],  # Use method labels for legend
+                        boxmean='sd',
+                        marker=dict(color=method_colors[method]),  # Assign color based on method
+                        text=[method_labels[method]] * len(data),  # Text annotation for each box
+                        hoverinfo="text",
+                    ),
+                    row=files.index(dataset) + 1, col=col  # Row index starts from 1
+                )
+
+# Add traces for ARI and NMI
+for col, metric in enumerate(metrics, start=1):
+    add_traces(fig, metric, col)
+
+# Update layout
+for i, dataset in enumerate(dataset_labels, start=1):
+    fig.update_yaxes(title_text=dataset, row=i, col=1)
+    fig.update_xaxes(title_text="", row=i, col=1)  # Remove x-axis label for better space utilization
+
+fig.update_layout(
+    height=1600,
+    width=1200,
+    title_text="",
+    showlegend=False,
+    legend_title_text="Methods",
+    font=dict(size=20)  # Increase font size
+)
+
+for i in range(2):
+    fig.layout.annotations[i].font.size = 25  # Increase subplot titles font size
+
+# Save the figure as an HTML file
+pio.write_image(fig, "synthetic_summary.pdf")
